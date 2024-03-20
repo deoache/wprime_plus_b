@@ -99,7 +99,11 @@ def main(args):
         for root_file in data.values():
             if args["nfiles"] != -1:
                 root_file = root_file[: args["nfiles"]]
-        if args["facility"] == "coffea-casa":
+                
+        if sample.startswith("Signal"):
+            fileset[sample] = [f"root://eoscms.cern.ch//eos/cms/" + file for file in root_file]
+            
+        elif args["facility"] == "coffea-casa":
             fileset[sample] = [f"root://xcache/" + file for file in root_file]
         else:
             fileset[sample] = root_file

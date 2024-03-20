@@ -60,3 +60,21 @@ WZ:
   nsplit: 1
 ZZ:
   nsplit: 1
+SignalTau_600Gev:
+  nsplit: 1
+SignalTau_1Tev:
+  nsplit: 1
+SignalTau_2Tev:
+  nsplit: 1
+SignalMuon_600GeV:
+  nsplit: 1
+SignalMuon_1TeV:
+  nsplit: 1
+SignalMuon_2TeV:
+  nsplit: 1
+SignalElectron_600GeV:
+  nsplit: 1
+SignalElectron_2TeV:
+  nsplit: 1
+SignalElectron_2TeV:
+  nsplit: 1

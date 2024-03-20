@@ -56,8 +56,12 @@ def build_filesets(args: dict) -> None:
     """
     main_dir = Path.cwd()
     fileset_path = Path(f"{main_dir}/wprime_plus_b/fileset")
-    with open(f"{fileset_path}/das_datasets.json", "r") as f:
-        datasets = json.load(f)[f"{args['year']}_UL"]
+    if args['sample'].startswith("Signal"):
+        with open(f"{fileset_path}/signal_{args['year']}.json", "r") as f:
+            datasets = json.load(f)
+    else:
+        with open(f"{fileset_path}/das_datasets.json", "r") as f:
+            datasets = json.load(f)[f"{args['year']}_UL"]
 
     # make output filesets directory
     output_directory = Path(f"{fileset_path}/{args['year']}/{args['facility']}")
@@ -67,13 +71,24 @@ def build_filesets(args: dict) -> None:
                 file.unlink()
     else:
         output_directory.mkdir(parents=True)
+    #print(datasets)
     for sample in datasets:
-        if args['facility'] == "lxplus":
+        
+        if sample !=args['sample']: continue
+        #print("incio",args['sample'])
+        if args['sample'].startswith("Signal"):            
+            json_file = f"{fileset_path}/signal_{args['year']}.json"
+            #print("hasta aqui",json_file)
+            
+        elif args['facility'] == "lxplus":
             json_file = f"{fileset_path}/fileset_{args['year']}_UL_NANO_lxplus.json"
+            
         else:
             json_file = f"{fileset_path}/fileset_{args['year']}_UL_NANO.json"
+        
         with open(json_file, "r") as handle:
             data = json.load(handle)
+        #print("data",data)
         # split fileset and save filesets
         filesets = {}
         # load dataset config
@@ -162,7 +177,7 @@ def run_checker(args: dict) -> None:
     fileset_path = Path(f"{Path.cwd()}/wprime_plus_b/fileset")
     with open(f"{fileset_path}/das_datasets.json", "r") as f:
         datasets = json.load(f)[args["year"] + args["yearmod"] + "_UL"]
-    available_samples = list(datasets.keys())
+    available_samples = list(datasets.keys())+["SignalTau_600Gev","SignalTau_1TeV","SignalTau_2TeV","SignalMuon_600GeV","SignalMuon_1TeV","SignalMuon_2TeV","SignalElectron_600GeV","SignalElectron_1TeV","SignalElectron_2TeV"]
     if args["sample"] not in available_samples:
         raise ValueError(
             f"Incorrect sample. Available samples are: {available_samples}"
