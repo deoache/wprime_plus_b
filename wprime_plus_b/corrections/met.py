@@ -154,3 +154,30 @@ def update_met_jet_veto(events, year) -> None:
     # update MET fields
     events["MET", "pt"] = new_met_pt
     events["MET", "phi"] = new_met_phi
+    
+    
+    
+def update_met_tt_estimation(events, bjets):
+    # all bjets pT (x,y) components
+    jet_pt_x = bjets.pt * np.cos(bjets.phi)
+    jet_pt_y = bjets.pt * np.sin(bjets.phi)
+    
+    # all bjets pT - subleading bjet pT (x,y) components
+    subleading_bjets = ak.pad_none(bjets, 2)[:, 1]
+    jet_minus_subjet_pt_x = jet_pt_x - subleading_bjets.pt * np.cos(subleading_bjets.phi)
+    jet_minus_subjet_pt_y = jet_pt_y - subleading_bjets.pt * np.sin(subleading_bjets.phi)
+    
+    # compute changes from original pT (all jets pT) to new pT (all jets pT - subleading jet pT) for (x,y) components
+    delta_x = ak.sum(jet_pt_x, axis=-1) - ak.sum(jet_minus_subjet_pt_x, axis=-1)
+    delta_y = ak.sum(jet_pt_y, axis=-1) - ak.sum(jet_minus_subjet_pt_y, axis=-1)
+    
+    # propagate changes to MET (x, y) components
+    met = events.MET
+    met_pt = met.pt
+    met_phi = met.phi
+    met_px = met_pt * np.cos(met_phi) - delta_x
+    met_py = met_pt * np.sin(met_phi) - delta_y
+
+    # update MET pT and phi fields
+    events["MET", "pt"] = np.sqrt((met_px ** 2.0 + met_py ** 2.0))
+    events["MET", "phi"] = np.arctan2(met_py, met_px)
